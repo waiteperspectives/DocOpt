@@ -1,18 +1,27 @@
-// desired behavior
-// cli inputs |> ingest |> handle or query |> publish
-// where ingest =
-// cli inputs |> optdict |> Stop DTO |> DTO |> Command or Query
-// and handle =
-// Command |> commandhandler |> events |> tee "some file" |> eventhandlers |> "ack"
-// and query =
-// Query |> queryhandler |> "query results string"
-// and publish =
-// "ack" or "query results string" |> printfn "%s"
-
-
 open Docopt
 open Docopt.Arguments
 
+
+// Desired CLI
+//let DOC = """
+//Herd Inventory
+//=============================================================
+//
+//Usage:
+//  cow born <name> --dam=<dam> [--asof=<date>] [--force]...
+//  cow died <name> [--asof=<date>] [--force]...
+//  cow bought <name> [--asof=<date>] [--force]...
+//  cow sold <name> [--asof=<date>]...
+//  cow show <name> [--asof=<date>]...
+//  cow show --report=<report> [--asof=<date>]
+//  cow (-h | --help)
+//  cow --version
+//
+//
+//Options:
+//  -h --help     Show this screen.
+//  --version     Show version.
+//"""
 
 let DOC = """
 Herd Inventory
@@ -20,11 +29,6 @@ Herd Inventory
 
 Usage:
   cow born <name> --dam=<dam> [--asof=<date>] [--force]...
-  cow died <name> [--asof=<date>] [--force]...
-  cow bought <name> [--asof=<date>] [--force]...
-  cow sold <name> [--asof=<date>]...
-  cow show <name> [--asof=<date>]...
-  cow show --report=<report> [--asof=<date>]
   cow (-h | --help)
   cow --version
 
@@ -39,8 +43,8 @@ let NOTIMPLEMENTED = "This command has not yet been implmented"
 let INVALIDCOMMAND = sprintf "Invalid Command!\n%s" DOC
 
 type BornCommand = {
-  name: string
-  dam: string
+  Name: string
+  Dam: string
 }
 
 // "Help" and "Version" are not domain objects, so should not be sent deeper
@@ -64,7 +68,7 @@ let handleCliCommand (request:CliCommand): CliResponse =
   match request with
   | Help s -> CliResponse s
   | Version s -> CliResponse s
-  | Born r -> CliResponse (sprintf "{name=%s; dam=%s}" r.name r.dam)
+  | Born r -> CliResponse (sprintf "Saved! {name=%s; dam=%s}" r.Name r.Dam)
   | Invalid x -> CliResponse x
 
 
@@ -90,7 +94,7 @@ let makeBornCommand (parsed:Docopt.Arguments.Dictionary) : CliCommand =
     | Argument s -> s
     | _ -> "who cares"
   
-  Born {name=herName; dam=herDam}
+  Born {Name=herName; Dam=herDam}
   
 
 
@@ -132,7 +136,7 @@ let bornStop (parsed:Docopt.Arguments.Dictionary): StopOrContinue =
 
 
 
-// wire up railroad (help | version | born | died | bought | sold ...)
+// wireup: (help | version | born | died | bought | sold ...)
 // uses Railway oriented programing style of handling subcommands -
 // if one is matched, parsing stops and executes the subcommand
 let versionStop' = bind versionStop
