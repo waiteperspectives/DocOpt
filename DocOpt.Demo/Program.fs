@@ -39,8 +39,8 @@ Options:
 """
 
 let VERSION = "\nHerd Inventory - Version 1.0.0\n\n"
-let NOTIMPLEMENTED = "This command has not yet been implmented"
-let INVALIDCOMMAND = sprintf "Invalid Command!\n%s" DOC
+let NOTIMPLEMENTED = "This command has not yet been implemented"
+let INVALID_COMMAND = sprintf "Invalid Command!\n%s" DOC
 
 type BornCommand = {
   Name: string
@@ -136,7 +136,7 @@ let bornStop (parsed:Docopt.Arguments.Dictionary): StopOrContinue =
 
 
 
-// wireup: (help | version | born | died | bought | sold ...)
+// wire-up: (help | version | born | died | bought | sold ...)
 // uses Railway oriented programing style of handling subcommands -
 // if one is matched, parsing stops and executes the subcommand
 let versionStop' = bind versionStop
@@ -146,7 +146,7 @@ let convertToCliCommand (input:Docopt.Arguments.Dictionary): CliCommand =
   input |> railroad |> (fun stopOrContinue ->
     match stopOrContinue with
     | Stop cliCmd -> cliCmd
-    | Continue _ -> Invalid INVALIDCOMMAND)
+    | Continue _ -> Invalid INVALID_COMMAND)
 
 
 [<EntryPoint>]
